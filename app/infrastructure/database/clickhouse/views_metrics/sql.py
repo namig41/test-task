@@ -1,9 +1,7 @@
 from typing import Final
 
 
-INITIALIZE_PHRASES_VIEWS_SQL_QUERY: Final[
-    str
-] = """
+INITIALIZE_PHRASES_VIEWS_SQL_QUERY: Final[str] = """
 CREATE TABLE phrases_views
 (
     dt          DateTime,

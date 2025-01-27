@@ -1,9 +1,7 @@
 from typing import Final
 
 
-CREATE_REPOSITORIES_TABLES_SQL_QUERY: Final[
-    str
-] = """
+CREATE_REPOSITORIES_TABLES_SQL_QUERY: Final[str] = """
 CREATE TABLE test.repositories
 (
     name     String,
@@ -34,21 +32,17 @@ CREATE TABLE test.repositories_positions
       ORDER BY (date, repo);
 """
 
-GET_REPOSITORY_BY_NAME: Final[
-    str
-] = """
+GET_REPOSITORY_BY_NAME: Final[str] = """
 SELECT * FROM repositories WHERE name = $1 AND owner = $2;
 """
 
-INSERT_REPOSITORY: Final[
-    str
-] = """
+INSERT_REPOSITORY: Final[str] = """
 INSERT INTO repositories (name, owner, stars, watchers, forks, language)
 VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING id;
 """
 
-GET_REPOSITORY_WITH_DETAILS = """
+GET_REPOSITORY_WITH_DETAILS: Final[str] = """
 SELECT
     r.name,
     r.owner,

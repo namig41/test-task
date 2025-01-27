@@ -17,7 +17,11 @@ def convert_commit_data_to_author_stats(
     today_datetime: datetime = ts_now()
 
     today_start: str = (
-        today_datetime.replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+        today_datetime.replace(
+            hour=0,
+            minute=0,
+            second=0,
+        ).isoformat()
         + "Z"
     )
     today_end: str = (
@@ -25,7 +29,6 @@ def convert_commit_data_to_author_stats(
             hour=23,
             minute=59,
             second=59,
-            microsecond=999999,
         ).isoformat()
         + "Z"
     )

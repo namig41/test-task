@@ -11,7 +11,7 @@ class DatabaseConnectionFailedException(InfraException):
 
 
 @dataclass(eq=False)
-class DatabaseRunFailedException(InfraException):
+class DatabaseInitialFailedException(InfraException):
     @property
     def message(self):
         return "Ошибка инициализации базы данных"

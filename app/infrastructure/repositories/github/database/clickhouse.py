@@ -18,8 +18,9 @@ from infrastructure.repositories.github.database.converters import (
 
 
 class GitHubClickHouseRepository(BaseGitHubRepository):
-    def __init__(self, client: ChClient):
+    def __init__(self, client: ChClient, batch_size: int = 10):
         self._client = client
+        self._batch_size = batch_size
 
     async def get_repository_by_name(self, name: str, owner: str) -> Repository:
         if rows := await self._client.fetch(
