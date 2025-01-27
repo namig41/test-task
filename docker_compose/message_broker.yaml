@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "${MESSAGE_BROKER_PORT}:5672"
+      - "${MESSAGE_BROKER_UI_PORT}:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${MESSAGE_BROKER_USER}
+      RABBITMQ_DEFAULT_PASS: ${MESSAGE_BROKER_PASSWORD}
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

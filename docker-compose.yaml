@@ -1,0 +1,75 @@
+version: '3.9'
+
+services:
+  service_api_app:
+    container_name: service_api_app
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    command: "uv run uvicorn --factory presentation.api.main:create_app --reload --host 0.0.0.0 --port 8000"
+    ports:
+      - '${SERVICE_API_PORT}:8000'
+    volumes:
+      - ../app/:/app
+    env_file:
+      - ../.env
+    networks:
+      - backend
+
+  cache:
+    image: redis:6
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "${CACHE_PORT}:6379"
+    networks:
+      - backend
+
+  db_postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    ports:
+      - "${DATABASE_PORT}:5432"
+    volumes:
+      - local_pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  pgadmin4:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - backend
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "${MESSAGE_BROKER_PORT}:5672"
+      - "${MESSAGE_BROKER_UI_PORT}:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${MESSAGE_BROKER_USER}
+      RABBITMQ_DEFAULT_PASS: ${MESSAGE_BROKER_PASSWORD}
+    networks:
+      - backend
+
+volumes:
+  local_pgdata:
+  pgadmin-data:
+
+networks:
+  backend:
+    driver: bridge
