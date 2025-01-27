@@ -16,9 +16,9 @@ class DatabaseInitialFailedException(InfraException):
     def message(self):
         return "Ошибка инициализации базы данных"
 
+
 @dataclass(eq=False)
 class RepositoryNotFoundException(InfraException):
     @property
     def message(self):
         return "Репозиторий не найден"
-

@@ -1,7 +1,6 @@
-from punq import Container
 import pytest
+from punq import Container
 
-from domain.entities.github import Repository
 from infrastructure.repositories.github.api.scrapper import GithubRepositoryScrapper
 
 
