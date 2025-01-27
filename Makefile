@@ -6,7 +6,7 @@ ENV = --env-file .env
 # === All Project ===
 .PHONY: all
 all:
-	${DC} -f ${DATABASE_FILE} ${ENV} up --build -d
+	${DC} -f ${APP_FILE} ${ENV} up --build -d
 
 .PHONY: drop
 drop:
@@ -14,4 +14,4 @@ drop:
 
 .PHONY: clean
 clean:
-	${DC} -f ${APP_FILE} rm -f
+	${DC} -f ${APP_FILE} down --volumes --remove-orphans

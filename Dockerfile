@@ -6,15 +6,13 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 RUN apt-get update && \
-    apt-get install -y python3-dev gcc musl-dev && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y python3-dev gcc musl-dev
 
-ADD pyproject.toml /app/
-ADD uv.lock /app/
+COPY uv.lock pyproject.toml /app/
 
 RUN pip install --upgrade pip
 RUN pip install uv
 
-RUN uv sync
+RUN uv sync --no-dev
 
-COPY /app/* /app/
+COPY ./app /app

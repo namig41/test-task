@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     DATABASE_CLICKHOUSE_HOST: str
     DATABASE_CLICKHOUSE_PORT: int
     DATABASE_CLICKHOUSE_HTTP: int
+    
+    GITHUB_ACCESS_TOKEN: str
 
 
 settings: Settings = Settings()

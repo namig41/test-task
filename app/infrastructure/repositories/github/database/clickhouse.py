@@ -10,6 +10,7 @@ from infrastructure.database.clickhouse.github.sqls import (
     GET_REPOSITORY_WITH_DETAILS,
     INSERT_REPOSITORY,
 )
+from infrastructure.exceptions.database import RepositoryNotFoundException
 from infrastructure.repositories.github.database.base import BaseGitHubRepository
 from infrastructure.repositories.github.database.converters import (
     convert_repository_record_to_author_stats_entity,
@@ -23,11 +24,13 @@ class GitHubClickHouseRepository(BaseGitHubRepository):
         self._batch_size = batch_size
 
     async def get_repository_by_name(self, name: str, owner: str) -> Repository:
-        if rows := await self._client.fetch(
+        rows = await self._client.fetch(
             GET_REPOSITORY_WITH_DETAILS,
             {"name": name, "owner": owner},
-        ):
-            raise
+        )
+
+        if not rows:
+            raise RepositoryNotFoundException()
 
         authors_commits: list[RepositoryAuthorCommitsNum] = (
             convert_repository_record_to_author_stats_entity(rows)

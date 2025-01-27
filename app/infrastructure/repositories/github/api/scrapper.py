@@ -69,7 +69,7 @@ class GithubRepositoryScrapper:
         return data
 
     async def get_repositories(self) -> list[Repository]:
-        top_repos: list[dict[str, Any]] = await self._get_top_repositories(limit=100)
+        top_repos: list[dict[str, Any]] = await self._get_top_repositories(limit=5)
         repositories: list[Repository] = []
 
         for repo_data in top_repos:

@@ -8,8 +8,8 @@ services:
     command: "uv run uvicorn --factory presentation.api.main:create_app --reload --host 0.0.0.0 --port 8000"
     ports:
       - '${SERVICE_API_PORT}:8000'
-    volumes:
-      - ./app/:/app
+    # volumes:
+    #   - ./app/:/app
     env_file:
       - .env
     networks:
@@ -60,19 +60,6 @@ services:
     networks:
       - backend
     restart: always
-
-  clickhouse-client:
-    image: yandex/clickhouse-client:latest
-    container_name: clickhouse-client
-    command: >
-      bash -c "
-        sleep 5;
-        clickhouse-client --host clickhouse-server --query 'SELECT 1'
-      "
-    depends_on:
-      - clickhouse-server
-    networks:
-      - backend
 
 volumes:
   local_pgdata:

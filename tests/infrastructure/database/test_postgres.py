@@ -13,7 +13,7 @@ from infrastructure.database.postgres.init import (
 async def test_postgres_connection():
     connection: Connection = await get_pg_connection()
     result = await connection.fetch('SELECT 1')
-    result_dict: dict[str, Any] = dict(result)
+    result_dict = [dict(record) for record in result]
     assert result_dict == [{'?column?': 1}]
     await connection.close()
 
