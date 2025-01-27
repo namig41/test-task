@@ -1,3 +1,4 @@
+import asyncio
 from typing import Any
 
 from aiohttp import ClientSession
@@ -6,15 +7,15 @@ from domain.entities.github import (
     Repository,
     RepositoryAuthorCommitsNum,
 )
-from infrastructure.repositories.github.constatns import GITHUB_API_BASE_URL
-from infrastructure.repositories.github.converters import (
+from infrastructure.repositories.github.api.constatns import GITHUB_API_BASE_URL
+from infrastructure.repositories.github.api.converters import (
     convert_commit_data_to_author_stats,
     convert_repository_data_to_model,
 )
 
 
 class GithubRepositoryScrapper:
-    def __init__(self, access_token: str):
+    def __init__(self, access_token: str, mcr: int = 10, rps: float = 1.0):
         self._session = ClientSession(
             headers={
                 "Accept": "application/vnd.github.v3+json",
@@ -22,18 +23,24 @@ class GithubRepositoryScrapper:
             },
         )
 
+        self.mcr = mcr
+        self.rps = rps
+        self._semaphore = asyncio.Semaphore(mcr)
+
     async def _make_request(
         self,
         endpoint: str,
         method: str = "GET",
         params: dict[str, Any] | None = None,
     ) -> Any:
-        async with self._session.request(
-            method,
-            f"{GITHUB_API_BASE_URL}/{endpoint}",
-            params=params,
-        ) as response:
-            return await response.json()
+        async with self._semaphore:
+            await asyncio.sleep(self.rps)
+            async with self._session.request(
+                method,
+                f"{GITHUB_API_BASE_URL}/{endpoint}",
+                params=params,
+            ) as response:
+                return await response.json()
 
     async def _get_top_repositories(self, limit: int = 100) -> list[dict[str, Any]]:
         """GitHub REST API: https://docs.github.com/en/rest/search/search?apiVersion=2022-11-28#search-repositories"""

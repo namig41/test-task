@@ -18,5 +18,12 @@ class Settings(BaseSettings):
     PGADMIN_EMAIL: str
     PGADMIN_PASSWORD: str
 
+    DATABASE_CLICKHOUSE_USER: str
+    DATABASE_CLICKHOUSE_PASSWORD: str
+    DATABASE_CLICKHOUSE_NAME: str
+    DATABASE_CLICKHOUSE_HOST: str
+    DATABASE_CLICKHOUSE_PORT: int
+    DATABASE_CLICKHOUSE_HTTP: int
+
 
 settings: Settings = Settings()

@@ -5,7 +5,7 @@
 import datetime
 
 
-def ts_now() -> datetime:
+def ts_now() -> datetime.datetime:
     """
     Возвращает текущий timestamp по GTM.
 
