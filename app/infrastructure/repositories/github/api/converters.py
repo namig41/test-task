@@ -1,14 +1,16 @@
 from datetime import datetime
 from typing import Any
+
+from tools.time_utils import ts_now
+
 from domain.entities.github import (
     Repository,
     RepositoryAuthorCommitsNum,
 )
-from tools.time_utils import ts_now
 
 
 def convert_commit_data_to_author_stats(
-    commits: list[dict[str, Any]]
+    commits: list[dict[str, Any]],
 ) -> list[RepositoryAuthorCommitsNum]:
     authors_commits: dict[str, Any] = {}
 
@@ -20,7 +22,10 @@ def convert_commit_data_to_author_stats(
     )
     today_end: str = (
         today_datetime.replace(
-            hour=23, minute=59, second=59, microsecond=999999
+            hour=23,
+            minute=59,
+            second=59,
+            microsecond=999999,
         ).isoformat()
         + "Z"
     )
@@ -42,7 +47,8 @@ def convert_commit_data_to_author_stats(
 
 
 def convert_repository_data_to_model(
-    repo_data: dict[str, Any], position: int
+    repo_data: dict[str, Any],
+    position: int,
 ) -> Repository:
     owner: str = repo_data["owner"]["login"]
     name: str = repo_data["name"]

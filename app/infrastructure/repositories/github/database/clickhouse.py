@@ -1,6 +1,11 @@
 from typing import Any
+
 from aiochclient import ChClient
-from domain.entities.github import Repository, RepositoryAuthorCommitsNum
+
+from domain.entities.github import (
+    Repository,
+    RepositoryAuthorCommitsNum,
+)
 from infrastructure.database.clickhouse.github.sqls import (
     GET_REPOSITORY_WITH_DETAILS,
     INSERT_REPOSITORY,
@@ -18,11 +23,14 @@ class GitHubClickHouseRepository(BaseGitHubRepository):
 
     async def get_repository_by_name(self, name: str, owner: str) -> Repository:
         if rows := await self._client.fetch(
-            GET_REPOSITORY_WITH_DETAILS, {"name": name, "owner": owner}
+            GET_REPOSITORY_WITH_DETAILS,
+            {"name": name, "owner": owner},
         ):
             raise
 
-        authors_commits: list[RepositoryAuthorCommitsNum] = convert_repository_record_to_author_stats_entity(rows)
+        authors_commits: list[RepositoryAuthorCommitsNum] = (
+            convert_repository_record_to_author_stats_entity(rows)
+        )
 
         first_row: dict[str, Any] = rows[0]
         repository: Repository = convert_repository_record_to_entity(first_row)

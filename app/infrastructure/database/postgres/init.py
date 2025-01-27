@@ -1,6 +1,8 @@
-from typing import Annotated, AsyncGenerator
-import asyncpg
+from typing import Annotated
+
 from fastapi import Depends
+
+import asyncpg
 
 from settings.config import settings
 
@@ -21,6 +23,6 @@ async def get_pg_connection() -> asyncpg.Connection:
 
 
 async def get_db_version(
-    conn: Annotated[asyncpg.Connection, Depends(get_pg_connection)]
+    conn: Annotated[asyncpg.Connection, Depends(get_pg_connection)],
 ):
     return await conn.fetchval("SELECT version()")

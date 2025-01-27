@@ -1,18 +1,9 @@
-from functools import (
-    lru_cache,
-    partial,
-)
+from functools import lru_cache
 
-from aio_pika.abc import (
-    AbstractChannel,
-    AbstractConnection,
-)
 from punq import (
     Container,
     Scope,
 )
-from redis.asyncio import Redis
-from sqlalchemy.ext.asyncio.engine import AsyncEngine
 
 from infrastructure.logger.base import ILogger
 from infrastructure.logger.factory import create_logger_dependency

@@ -1,5 +1,9 @@
 from typing import Any
-from domain.entities.github import Repository, RepositoryAuthorCommitsNum
+
+from domain.entities.github import (
+    Repository,
+    RepositoryAuthorCommitsNum,
+)
 
 
 def convert_repository_record_to_entity(record: dict[str, Any]) -> Repository:
@@ -15,7 +19,7 @@ def convert_repository_record_to_entity(record: dict[str, Any]) -> Repository:
 
 
 def convert_repository_record_to_author_stats_entity(
-    records: list[dict[str, Any]]
+    records: list[dict[str, Any]],
 ) -> list[RepositoryAuthorCommitsNum]:
 
     authors_commits: list[RepositoryAuthorCommitsNum] = [

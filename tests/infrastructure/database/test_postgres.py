@@ -1,6 +1,11 @@
-from asyncpg import Connection
 import pytest
-from infrastructure.database.postgres.init import get_db_version, get_pg_connection
+from asyncpg import Connection
+
+from infrastructure.database.postgres.init import (
+    get_db_version,
+    get_pg_connection,
+)
+
 
 @pytest.mark.asyncio
 async def test_postgres_connection():
@@ -9,8 +14,8 @@ async def test_postgres_connection():
     result_dict = [dict(record) for record in result]
     assert result_dict == [{'?column?': 1}]
     await connection.close()
-    
-    
+
+
 @pytest.mark.asyncio
 async def test_postgres_version():
     connection: Connection = await get_pg_connection()

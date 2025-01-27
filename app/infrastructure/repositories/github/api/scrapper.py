@@ -1,14 +1,15 @@
 from typing import Any
+
 from aiohttp import ClientSession
 
+from domain.entities.github import (
+    Repository,
+    RepositoryAuthorCommitsNum,
+)
 from infrastructure.repositories.github.constatns import GITHUB_API_BASE_URL
 from infrastructure.repositories.github.converters import (
     convert_commit_data_to_author_stats,
     convert_repository_data_to_model,
-)
-from domain.entities.github import (
-    Repository,
-    RepositoryAuthorCommitsNum,
 )
 
 
@@ -18,14 +19,19 @@ class GithubRepositoryScrapper:
             headers={
                 "Accept": "application/vnd.github.v3+json",
                 "Authorization": f"Bearer {access_token}",
-            }
+            },
         )
 
     async def _make_request(
-        self, endpoint: str, method: str = "GET", params: dict[str, Any] | None = None
+        self,
+        endpoint: str,
+        method: str = "GET",
+        params: dict[str, Any] | None = None,
     ) -> Any:
         async with self._session.request(
-            method, f"{GITHUB_API_BASE_URL}/{endpoint}", params=params
+            method,
+            f"{GITHUB_API_BASE_URL}/{endpoint}",
+            params=params,
         ) as response:
             return await response.json()
 
@@ -43,7 +49,9 @@ class GithubRepositoryScrapper:
         return data["items"]
 
     async def _get_repository_commits(
-        self, owner: str, repo: str
+        self,
+        owner: str,
+        repo: str,
     ) -> list[dict[str, Any]]:
         """
         GitHub REST API: https://docs.github.com/en/rest/commits/commits?apiVersion=2022-11-28#list-commits
@@ -59,10 +67,12 @@ class GithubRepositoryScrapper:
 
         for repo_data in top_repos:
             repository: Repository = convert_repository_data_to_model(
-                repo_data, top_repos.index(repo_data) + 1
+                repo_data,
+                top_repos.index(repo_data) + 1,
             )
             commits: list[dict[str, Any]] = await self._get_repository_commits(
-                owner=repository.owner, repo=repository.name
+                owner=repository.owner,
+                repo=repository.name,
             )
             authors_commits_num_today: list[RepositoryAuthorCommitsNum] = (
                 convert_commit_data_to_author_stats(commits)

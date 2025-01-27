@@ -49,7 +49,7 @@ RETURNING id;
 """
 
 GET_REPOSITORY_WITH_DETAILS = """
-SELECT 
+SELECT
     r.name,
     r.owner,
     p.position,
@@ -60,14 +60,14 @@ SELECT
     rac.date,
     rac.author,
     rac.commits_num
-FROM 
+FROM
     test.repositories AS r
-LEFT JOIN 
+LEFT JOIN
     test.repositories_positions AS p
     ON r.name = p.repo
-LEFT JOIN 
+LEFT JOIN
     test.repositories_authors_commits AS rac
     ON r.name = rac.repo AND rac.date = today()
-WHERE 
+WHERE
     r.name = {name: String} AND r.owner = {owner: String};
 """
