@@ -5,10 +5,10 @@
 import datetime
 
 
-def ts_now() -> float:
+def ts_now() -> datetime:
     """
     Возвращает текущий timestamp по GTM.
 
-    :return: Значение в секундах
+    :return: Значение даты
     """
-    return datetime.datetime.now(datetime.timezone.utc).timestamp()
+    return datetime.datetime.now(datetime.timezone.utc)

@@ -4,24 +4,14 @@ services:
   service_api_app:
     container_name: service_api_app
     build:
-      context: ..
       dockerfile: Dockerfile
     command: "uv run uvicorn --factory presentation.api.main:create_app --reload --host 0.0.0.0 --port 8000"
     ports:
       - '${SERVICE_API_PORT}:8000'
     volumes:
-      - ../app/:/app
+      - ./app/:/app
     env_file:
-      - ../.env
-    networks:
-      - backend
-
-  cache:
-    image: redis:6
-    container_name: redis
-    restart: unless-stopped
-    ports:
-      - "${CACHE_PORT}:6379"
+      - .env
     networks:
       - backend
 
@@ -54,21 +44,40 @@ services:
     networks:
       - backend
 
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    ports:
-      - "${MESSAGE_BROKER_PORT}:5672"
-      - "${MESSAGE_BROKER_UI_PORT}:15672"
+  clickhouse-server:
+    image: yandex/clickhouse-server:latest
+    container_name: clickhouse-server
     environment:
-      RABBITMQ_DEFAULT_USER: ${MESSAGE_BROKER_USER}
-      RABBITMQ_DEFAULT_PASS: ${MESSAGE_BROKER_PASSWORD}
+      - CLICKHOUSE_DB=${DATABASE_CLICKHOUSE_NAME}
+      - CLICKHOUSE_USER=${DATABASE_CLICKHOUSE_USER}
+      - CLICKHOUSE_PASSWORD=${DATABASE_CLICKHOUSE_PASSWORD}
+    ports:
+      - "${DATABASE_CLICKHOUSE_HTTP}:8123"
+      - "${DATABASE_CLICKHOUSE_PORT}:9000"
+      - "9009:9009"
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+    networks:
+      - backend
+    restart: always
+
+  clickhouse-client:
+    image: yandex/clickhouse-client:latest
+    container_name: clickhouse-client
+    command: >
+      bash -c "
+        sleep 5;
+        clickhouse-client --host clickhouse-server --query 'SELECT 1'
+      "
+    depends_on:
+      - clickhouse-server
     networks:
       - backend
 
 volumes:
   local_pgdata:
   pgadmin-data:
+  clickhouse-data:
 
 networks:
   backend:

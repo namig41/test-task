@@ -10,7 +10,7 @@ from settings.config import settings
 
 def create_app() -> FastAPI:
     app: FastAPI = FastAPI(
-        title="WeatherAPI",
+        title="e-Comet",
         docs_url="/api/docs/",
         debug=True,
         lifespan=lifespan,
@@ -22,7 +22,6 @@ def create_app() -> FastAPI:
 
 
 if __name__ == "__main__":
-
     uvicorn.run(
         "main:create_app",
         factory=True,

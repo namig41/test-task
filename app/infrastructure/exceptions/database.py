@@ -4,6 +4,13 @@ from infrastructure.exceptions.base import InfraException
 
 
 @dataclass(eq=False)
+class DatabaseConnectionFailedException(InfraException):
+    @property
+    def message(self):
+        return "Не удалось установить соединение с базой данных"
+
+
+@dataclass(eq=False)
 class DatabaseRunFailedException(InfraException):
     @property
     def message(self):

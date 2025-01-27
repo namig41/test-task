@@ -33,32 +33,6 @@ database-drop:
 database-rebuild:
 	${DC} -f ${DATABASE_FILE} build --no-cache
 
-# === Cache Section ===
-.PHONY: cache-start
-cache-start:
-	${DC} -f ${CACHE_FILE} up -d
-
-.PHONY: cache-drop
-cache-drop:
-	${DC} -f ${CACHE_FILE} down
-
-.PHONY: cache-remove
-cache-rebuild:
-	${DC} -f ${CACHE_FILE} build --no-cache
-
-# === Message Broker Section ===
-.PHONY: broker
-broker-start:
-	${DC} -f ${MESSAGE_BROKER_FILE} up -d
-
-.PHONY: broker-drop
-broker-drop:
-	${DC} -f ${MESSAGE_BROKER_FILE} down
-
-.PHONY: broker-rebuild
-broker-rebuild:
-	${DC} -f ${MESSAGE_BROKER_FILE} build --no-cache
-
 # === All Project ===
 .PHONY: all
 all:
