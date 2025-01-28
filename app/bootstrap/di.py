@@ -39,10 +39,13 @@ def _init_container() -> Container:
         scope=Scope.singleton,
     )
 
-    # Register GitHubScrapper
+    # TODO: Реализовать регистрацию скраппера с автоматической разрешение зависимостей
     container.register(
         GithubRepositoryScrapper,
-        lambda: GithubRepositoryScrapper(access_token=settings.GITHUB_ACCESS_TOKEN),
+        lambda: GithubRepositoryScrapper(
+            access_token=settings.GITHUB_ACCESS_TOKEN,
+            logger=container.resolve(ILogger),
+        ),
         scope=Scope.singleton,
     )
 
@@ -52,5 +55,4 @@ def _init_container() -> Container:
         GitHubClickHouseRepository,
         scope=Scope.singleton,
     )
-
     return container

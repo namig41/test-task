@@ -61,18 +61,6 @@ services:
       - backend
     restart: always
 
-  ch-ui:
-    image: ghcr.io/caioricciuti/ch-ui:latest
-    restart: always
-    ports:
-      - "5521:5521"
-    environment:
-      VITE_CLICKHOUSE_URL: "http://clickhouse-server:${DATABASE_CLICKHOUSE_HTTP}"
-      VITE_CLICKHOUSE_USER: ${DATABASE_CLICKHOUSE_USER}
-      VITE_CLICKHOUSE_PASS: ${DATABASE_CLICKHOUSE_PASSWORD}
-    networks:
-      - backend
-
 volumes:
   local_pgdata:
   pgadmin-data:

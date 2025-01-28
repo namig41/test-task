@@ -1,8 +1,10 @@
 import logging
+from dataclasses import dataclass
 
 from infrastructure.logger.base import ILogger
 
 
+@dataclass
 class Logger(ILogger):
 
     logger: logging.Logger

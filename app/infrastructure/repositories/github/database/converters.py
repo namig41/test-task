@@ -6,7 +6,7 @@ from domain.entities.github import (
 )
 
 
-def convert_repository_record_to_entity(record: dict[str, Any]) -> Repository:
+def convert_repository_data_to_entity(record: dict[str, Any]) -> Repository:
     return Repository(
         name=record["name"],
         owner=record["owner"],
@@ -18,7 +18,7 @@ def convert_repository_record_to_entity(record: dict[str, Any]) -> Repository:
     )
 
 
-def convert_repository_record_to_author_stats_entity(
+def convert_repository_data_to_author_stats_entity(
     records: list[dict[str, Any]],
 ) -> list[RepositoryAuthorCommitsNum]:
 
@@ -32,3 +32,34 @@ def convert_repository_record_to_author_stats_entity(
     ]
 
     return authors_commits
+
+
+def convert_repository_entity_to_data(repository: Repository) -> dict[str, Any]:
+    return {
+        "name": repository.name,
+        "owner": repository.owner,
+        "stars": repository.stars,
+        "watchers": repository.watchers,
+        "forks": repository.forks,
+        "language": repository.language,
+    }
+
+
+def convert_repository_entity_to_author_stats_data(
+    repository: Repository,
+) -> list[dict[str, Any]]:
+    return [
+        {
+            "repo": repository.name,
+            "author": author_commit.author,
+            "commits_num": author_commit.commits_num,
+        }
+        for author_commit in repository.authors_commits_num_today
+    ]
+
+
+def convert_repositoy_entity_to_position_data(repository: Repository) -> dict[str, Any]:
+    return {
+        "position": repository.position,
+        "repo": repository.name,
+    }

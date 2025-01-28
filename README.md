@@ -1,82 +1,80 @@
-# FastAPI DDD Boilerplate
+# GitHub Repository Scraper
 
-A boilerplate project for building scalable and maintainable applications using FastAPI with a Domain-Driven Design (DDD) approach. This template provides a solid foundation to structure your code and manage dependencies effectively.
+Проект предназначен для сбора данных о репозиториях с GitHub и их сохранения в базу данных ClickHouse. Система использует API GitHub для получения информации о популярных репозиториях и коммитах, а также ClickHouse для хранения и обработки данных.
 
-## Features
+## 🚀 Возможности
 
-- **FastAPI Framework**: High-performance and easy-to-use web framework for building APIs.
-- **Domain-Driven Design (DDD)**: Organized folder structure for separating concerns.
-- **Async Support**: Built-in support for asynchronous operations.
-- **Environment Configuration**: Centralized `.env` for easy environment variable management.
-- **Dependency Injection**: Simplified DI setup for managing dependencies.
+- Сбор информации о популярных репозиториях с GitHub.
+- Сохранение данных о репозиториях и статистике коммитов в ClickHouse.
+- Логирование всех операций.
+- Архитектура построена с использованием принципов слоистой архитектуры, что обеспечивает простоту масштабирования и тестирования.
 
-## Folder Structure
+## 🛠️ Технологии
 
-```
-fastapi-ddd-boilerplate/
-├── app/
-│   ├── bootstrap/        # Dependency injection setup
-│   ├── domain/           # Domain entities, value objects, aggregates
-│   ├── infrastructure/   # Database, caching, external services
-│   ├── presentation/     # API endpoints and related logic
-│   └── application/      # Application services, use cases
-├── tests/                # Unit and integration tests
-├── .env                  # Environment variables
-├── requirements.txt      # Python dependencies
-├── uv.py                 # Entry point for the application
-└── README.md             # Project documentation
-```
+- **Python 3.12+** для разработки.
+- **FastAPI** для создания REST API.
+- **GitHub API** для получения информации о репозиториях.
+- **ClickHouse** для хранения и анализа данных.
+- **aiohttp** для асинхронных HTTP-запросов.
+- **punq** для внедрения зависимостей.
+- **docker-compose** для контейнеризации.
+- **Makefile** для управления сборкой и запуском.
 
-## Prerequisites
+## ⚙️ Установка
 
-- Python 3.12 or higher
-- [uv](https://github.com/username/uv) as the package manager
+Для установки и запуска проекта выполните следующие шаги:
 
-## Setup
+1. Клонируйте репозиторий:
+    ```bash
+    git clone https://github.com/yourusername/github-api-client.git
+    cd github-api-client
+    ```
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/yourusername/fastapi-ddd-boilerplate.git
-   cd fastapi-ddd-boilerplate
-   ```
+2. Создайте и активируйте виртуальное окружение:
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate  # Для Linux/MacOS
+    venv\Scripts\activate  # Для Windows
+    ```
 
-2. **Install Dependencies**:
-   ```bash
-   uv install
-   ```
+3. Установите зависимости:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-3. **Setup Environment Variables**:
-   Create a `.env` file in the root directory and configure the required settings.
+4. Настройте файл конфигурации `.env`:
+    ```bash
+    cp .env.example .env
+    ```
 
-4. **Run Database Migrations** (if applicable):
-   ```bash
-   uv migrate
-   ```
+    В файле `.env` укажите:
+    - Ваш GitHub токен (для доступа к GitHub API).
+    - Данные для подключения к ClickHouse базе данных.
 
-5. **Start the Server**:
-   ```bash
-   uv run
-   ```
-   The application will be accessible at `http://127.0.0.1:8000`.
+5. **Сборка и запуск через Docker**:
+    Проект использует `Makefile` для автоматизации сборки и запуска через Docker.
 
-## Scripts
+    Для сборки и запуска используйте следующие команды:
 
-- `uv install`: Install dependencies
-- `uv run`: Start the FastAPI server
-- `uv test`: Run the test suite
-- `uv lint`: Check for code quality issues
+    - Для сборки Docker-образа:
+      ```bash
+      make
+      ```
 
-## Testing
+    - Для запуска контейнеров:
+      ```bash
+      make drop
+      ```
 
-Run the test suite using:
+    - Для очистка контейнеров:
+      ```bash
+      make clean
+      ```
+
+## 🧪 Тестирование
+
+Проект включает в себя юнит-тесты и интеграционные тесты. Для их выполнения используйте команду:
+
 ```bash
-uv test
+pytest
 ```
-
-## Contributing
-
-Contributions are welcome! Please fork the repository and submit a pull request with your changes.
-
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.

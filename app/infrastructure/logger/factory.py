@@ -1,9 +1,9 @@
 import logging
 import sys
-from functools import lru_cache
 from typing import TextIO
 
 from infrastructure.logger.base import ILogger
+from infrastructure.logger.logger import Logger
 
 
 def logger_factory(name: str, level: int, stream: TextIO) -> logging.Logger:
@@ -24,7 +24,6 @@ def logger_factory(name: str, level: int, stream: TextIO) -> logging.Logger:
     return logger
 
 
-@lru_cache(1)
 def create_logger_dependency() -> ILogger:
     common_logger: logging.Logger = logger_factory(
         name="common",
@@ -36,4 +35,4 @@ def create_logger_dependency() -> ILogger:
         level=logging.ERROR,
         stream=sys.stderr,
     )
-    return logging.Logger(logger=common_logger, error_logger=error_logger)
+    return Logger(logger=common_logger, error_logger=error_logger)

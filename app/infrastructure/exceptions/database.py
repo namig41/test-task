@@ -1,24 +1,17 @@
 from dataclasses import dataclass
 
-from infrastructure.exceptions.base import InfraException
+from infrastructure.exceptions.base import InfrastructureException
 
 
 @dataclass(eq=False)
-class DatabaseConnectionFailedException(InfraException):
+class DatabaseConnectionFailedException(InfrastructureException):
     @property
     def message(self):
         return "Не удалось установить соединение с базой данных"
 
 
 @dataclass(eq=False)
-class DatabaseInitialFailedException(InfraException):
+class DatabaseInitialFailedException(InfrastructureException):
     @property
     def message(self):
         return "Ошибка инициализации базы данных"
-
-
-@dataclass(eq=False)
-class RepositoryNotFoundException(InfraException):
-    @property
-    def message(self):
-        return "Репозиторий не найден"
