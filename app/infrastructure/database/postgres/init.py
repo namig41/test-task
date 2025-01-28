@@ -1,5 +1,6 @@
 from typing import Annotated
 
+# TODO: Логика низкоуровневых модулей не должна зависеть от высокоуровневых
 from fastapi import Depends
 
 import asyncpg
