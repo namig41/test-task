@@ -23,7 +23,7 @@ from infrastructure.repositories.github.api.converters import (
 
 class GithubRepositoryScrapper:
     def __init__(
-        self, access_token: str, logger: ILogger, mcr: int = 10, rps: float = 1.0,
+        self, access_token: str, logger: ILogger, mcr: int = 10, rps: float = .1,
     ):
         self._session = ClientSession(
             headers={
@@ -57,7 +57,7 @@ class GithubRepositoryScrapper:
                 ) as response:
                     response.raise_for_status()
                     data = await response.json()
-                    self.logger.info(f"Получен ответ: {data}")
+                    self.logger.info(f"Получен ответ")
                     return data
             except ClientError as e:
                 self.logger.error(f"Ошибка клиента при запросе к {endpoint}: {e}")
@@ -109,7 +109,7 @@ class GithubRepositoryScrapper:
 
     async def get_repositories(self) -> list[Repository]:
         self.logger.info("Начинаем получать топовые репозитории")
-        top_repos: list[dict[str, Any]] = await self._get_top_repositories(limit=5)
+        top_repos: list[dict[str, Any]] = await self._get_top_repositories(limit=10)
         repositories: list[Repository] = []
 
         for repo_data in top_repos:

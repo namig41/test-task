@@ -46,7 +46,7 @@ def _init_container() -> Container:
             access_token=settings.GITHUB_ACCESS_TOKEN,
             logger=container.resolve(ILogger),
         ),
-        scope=Scope.singleton,
+        scope=Scope.transient,
     )
 
     # Register GitHubRepository

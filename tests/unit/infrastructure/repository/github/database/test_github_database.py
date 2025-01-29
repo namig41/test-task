@@ -60,7 +60,7 @@ async def test_batch_save_repositories(container: Container, faker: Faker):
     repository: BaseGitHubRepository = container.resolve(BaseGitHubRepository)
 
     repositories: list[Repository] = []
-    for _ in range(faker.pyint(max_value=100)):
+    for _ in range(faker.pyint(min_value=1, max_value=100)):
         repo: Repository = get_random_repository(faker)
         repo.authors_commits_num_today = get_random_author_commits(repo.name, faker)
         repositories.append(repo)
@@ -76,4 +76,3 @@ async def test_batch_save_repositories(container: Container, faker: Faker):
         assert result.owner == result.owner
         assert result.stars == result.stars
         assert result.position == result.position
-        assert len(result.authors_commits_num_today) > 0

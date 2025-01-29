@@ -27,7 +27,7 @@ from infrastructure.repositories.github.database.converters import (
     convert_repositoy_entity_to_position_data,
 )
 from infrastructure.repositories.github.database.sqls import (
-    CREATE_REPOSITORIES_TABLES,
+    CREATE_REPOSITORIES_DATABASE,
     CREATE_REPOSITORIES_TABLES_SQL_QUERIES,
     GET_REPOSITORY_WITH_DETAILS,
     INSERT_AUTHORS_COMMITS,
@@ -116,7 +116,7 @@ class GitHubClickHouseRepository(BaseGitHubRepository):
 
     async def create_db(self) -> None:
         try:
-            await self._make_request(CREATE_REPOSITORIES_TABLES.format(settings.DATABASE_CLICKHOUSE_NAME))
+            await self._make_request(CREATE_REPOSITORIES_DATABASE.format(db_name=settings.DATABASE_CLICKHOUSE_NAME))
         except InfrastructureException:
             raise
 
@@ -150,6 +150,7 @@ class GitHubClickHouseRepository(BaseGitHubRepository):
             )
             raise InfrastructureException()
 
+    # NOTE Медленная вставка. Используется только для тестов
     async def save_repository(self, repository: Repository) -> None:
         self.logger.info(
             f"Сохранение репозитория {repository.name} от {repository.owner}",

@@ -1,7 +1,7 @@
 from typing import Final
 
 
-CREATE_REPOSITORIES_TABLES: Final[str] = "CREATE DATABASE IF NOT EXISTS {db_name}"
+CREATE_REPOSITORIES_DATABASE: Final[str] = "CREATE DATABASE IF NOT EXISTS {db_name}"
 
 # TODO: Добавить форматирование для базы данных
 
@@ -77,10 +77,10 @@ SELECT
     rac.commits_num commits_num
 FROM
     test.repositories AS r
-INNER JOIN
+LEFT JOIN
     test.repositories_positions AS p
     ON r.name = p.repo
-INNER JOIN
+LEFT JOIN
     test.repositories_authors_commits AS rac
     ON r.name = rac.repo AND rac.date = today()
 WHERE
