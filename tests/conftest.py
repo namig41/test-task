@@ -1,5 +1,8 @@
 from random import SystemRandom
-from typing import Any, AsyncGenerator
+from typing import (
+    Any,
+    AsyncGenerator,
+)
 
 import pytest
 import pytest_asyncio
@@ -31,5 +34,5 @@ async def setup_before_all_tests(container: Container, faker: Faker) -> AsyncGen
     await repository.create_tables()
 
     yield
-    
+
     await repository.drop_tables()
