@@ -54,7 +54,7 @@ class GitHubClickHouseRepository(BaseGitHubRepository):
                 url=f"http://{settings.DATABASE_CLICKHOUSE_HOST}:{settings.DATABASE_CLICKHOUSE_HTTP}/",
                 user=settings.DATABASE_CLICKHOUSE_USER,
                 password=settings.DATABASE_CLICKHOUSE_PASSWORD,
-                database=settings.DATABASE_CLICKHOUSE_NAME,
+                # database=settings.DATABASE_CLICKHOUSE_NAME,
                 compress_response=True,
             )
             try:
@@ -114,9 +114,9 @@ class GitHubClickHouseRepository(BaseGitHubRepository):
             self.logger.error(f"Ошибка при очистке таблицы: {e}")
             raise
 
-    async def create_db(self) -> None:
+    async def create_db(self, database_name: str) -> None:
         try:
-            await self._make_request(CREATE_REPOSITORIES_DATABASE.format(db_name=settings.DATABASE_CLICKHOUSE_NAME))
+            await self._make_request(CREATE_REPOSITORIES_DATABASE.format(db_name=database_name))
         except InfrastructureException:
             raise
 

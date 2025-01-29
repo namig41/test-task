@@ -3,7 +3,7 @@ from typing import Final
 
 CREATE_REPOSITORIES_DATABASE: Final[str] = "CREATE DATABASE IF NOT EXISTS {db_name}"
 
-# TODO: Добавить форматирование для базы данных
+# TODO: Добавить форматирование для имени базы данных. Все запросы выполняются в базе данных test
 
 CREATE_REPOSITORIES_TABLES_SQL_QUERIES: Final[list[str]] = [
     """
