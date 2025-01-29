@@ -1,9 +1,3 @@
-from typing import Final
-
-
-INITIALIZE_PHRASES_VIEWS_SQL_QUERY: Final[
-    str
-] = """
 CREATE TABLE phrases_views
 (
     dt          DateTime,
@@ -39,4 +33,21 @@ VALUES ('2025-01-01 11:50:00', 1111111, 'платье', 100),
        ('2025-01-01 15:40:00', 1111111, 'платье', 113),
        ('2025-01-01 15:50:00', 1111111, 'платье', 115),
        ('2025-01-01 16:00:00', 1111111, 'платье', 115);
-"""
+
+-- Решение четвертой задачи
+
+SELECT
+    phrase,
+    groupArray((hour, views_sum)) AS views_by_hour
+FROM (
+    SELECT
+        phrase,
+        toHour(dt) AS hour,
+        COUNT(views) AS views_sum
+    FROM phrases_views
+    WHERE
+        campaign_id = 1111111 -- Нужно указать идентификатор рекламной кампании id. Также нужно указать за сегодня toDate(dt) = today()
+    GROUP BY phrase, hour
+    ORDER BY hour DESC
+)
+GROUP BY phrase;
