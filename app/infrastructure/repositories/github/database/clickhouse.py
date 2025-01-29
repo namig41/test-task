@@ -1,8 +1,12 @@
 import asyncio
-from typing import Any
+from typing import (
+    Any,
+    Final,
+)
 
 import aiohttp
 from aiochclient import ChClient
+from tools import iterators
 
 from domain.entities.github import (
     Repository,
@@ -23,6 +27,7 @@ from infrastructure.repositories.github.database.converters import (
     convert_repositoy_entity_to_position_data,
 )
 from infrastructure.repositories.github.database.sqls import (
+    CREATE_REPOSITORIES_TABLES,
     CREATE_REPOSITORIES_TABLES_SQL_QUERIES,
     GET_REPOSITORY_WITH_DETAILS,
     INSERT_AUTHORS_COMMITS,
@@ -77,7 +82,7 @@ class GitHubClickHouseRepository(BaseGitHubRepository):
                 raise RepositoryTimeOutException()
             except Exception as e:
                 self.logger.error(f"Неизвестная ошибка при выполнении запроса: {e}")
-                raise InfrastructureException()
+                raise
             finally:
                 await client.close()
 
@@ -92,6 +97,28 @@ class GitHubClickHouseRepository(BaseGitHubRepository):
                     f"Ошибка при создании таблицы с запросом: {query}, ошибка: {e}",
                 )
                 raise
+
+    async def drop_tables(self) -> None:
+        queries = [
+            "TRUNCATE TABLE test.repositories",
+            "TRUNCATE TABLE test.repositories_positions",
+            "TRUNCATE TABLE test.repositories_authors_commits",
+        ]
+
+        try:
+            await asyncio.gather(
+                *[self._make_request(query) for query in queries],
+            )
+            self.logger.info(f"Таблицы успешно очищены: {queries}")
+        except Exception as e:
+            self.logger.error(f"Ошибка при очистке таблицы: {e}")
+            raise
+
+    async def create_db(self) -> None:
+        try:
+            await self._make_request(CREATE_REPOSITORIES_TABLES.format(settings.DATABASE_CLICKHOUSE_NAME))
+        except InfrastructureException:
+            raise
 
     async def get_repository_by_name(self, name: str, owner: str) -> Repository:
         self.logger.info(f"Получение репозитория {name} от {owner}")
@@ -131,18 +158,20 @@ class GitHubClickHouseRepository(BaseGitHubRepository):
             repository_data: dict[str, Any] = convert_repository_entity_to_data(
                 repository,
             )
-            await self._make_request(INSERT_REPOSITORY, repository_data)
 
             postion_data: dict[str, Any] = convert_repositoy_entity_to_position_data(
                 repository,
             )
-            await self._make_request(INSERT_POSITION, postion_data)
 
             author_stats_data: list[dict[str, Any]] = (
                 convert_repository_entity_to_author_stats_data(repository)
             )
-            for author_stat in author_stats_data:
-                await self._make_request(INSERT_AUTHORS_COMMITS, author_stat)
+
+            await asyncio.gather(
+                self._make_request(INSERT_REPOSITORY, repository_data),
+                self._make_request(INSERT_POSITION, postion_data),
+                *[self._make_request(INSERT_AUTHORS_COMMITS, author_stat) for author_stat in author_stats_data],
+            )
 
             self.logger.info(
                 f"Репозиторий {repository.name} от {repository.owner} успешно сохранён",
@@ -155,36 +184,72 @@ class GitHubClickHouseRepository(BaseGitHubRepository):
 
     async def save_repositories(self, repositories: list[Repository]) -> None:
         if not repositories:
-            self.logger.warning("Нет репозиториев для сохранения")
+            self.logger.debug("Нет репозиториев для сохранения")
             return
 
-        insert_query = """
+        # TODO: Вынести в константу
+        insert_repositories_query: Final[str] = """
             INSERT INTO test.repositories
             (name, owner, stars, watchers, forks, language, updated)
             VALUES
         """
 
-        batch_data = []
+        insert_positions_query: Final[str] = """
+            INSERT INTO test.repositories_positions (date, repo, position)
+            VALUES
+        """
+
+        insert_authors_commits_query: Final[str] = """
+            INSERT INTO test.repositories_authors_commits (date, repo, author, commits_num)
+            VALUES
+        """
+
+        batch_repositories_data: list[str] = []
+        batch_positions_data: list[str] = []
+        batch_authors_commits_data: list[str] = []
+
         self.logger.info(f"Начинаем сохранение {len(repositories)} репозиториев")
 
-        for idx, repo in enumerate(repositories):
-            batch_data.append(
-                f"('{repo.name}', '{repo.owner}', {repo.stars}, "
-                f"{repo.watchers}, {repo.forks}, '{repo.language}', now())",
-            )
+        for batch_repositories in iterators.batch_generator(repositories, self._batch_size):
+            for repo in batch_repositories:
+                batch_repositories_data.append(
+                    f"('{repo.name}', '{repo.owner}', {repo.stars}, "
+                    f"{repo.watchers}, {repo.forks}, '{repo.language}', now())",
+                )
 
-            if (idx + 1) % self._batch_size == 0 or (idx + 1) == len(repositories):
-                values_clause = ",".join(batch_data)
-                query = f"{insert_query} {values_clause}"
+                batch_positions_data.append(
+                    f"(now(), '{repo.name}', {repo.position})",
+                )
 
-                try:
-                    await self._make_request(query)
-                    self.logger.info(
-                        f"Пакет из {len(batch_data)} репозиториев успешно сохранён",
+                for commits_today in repo.authors_commits_num_today:
+                    batch_authors_commits_data.append(
+                        f"(now(), '{repo.name}', '{commits_today.author}', {commits_today.commits_num})",
                     )
-                except Exception as e:
-                    self.logger.error(f"Ошибка при сохранении пакета репозиториев: {e}")
-                    raise
-                batch_data.clear()
+
+                values_clause: str = ",".join(batch_repositories_data)
+                repository_query: str = f"{insert_repositories_query} {values_clause}"
+
+                values_clause: str = ",".join(batch_positions_data)
+                position_query: str = f"{insert_positions_query} {values_clause}"
+
+                values_clause: str = ",".join(batch_authors_commits_data)
+                author_commits_query: str = f"{insert_authors_commits_query} {values_clause}"
+
+            try:
+                await asyncio.gather(
+                    self._make_request(repository_query),
+                    self._make_request(position_query),
+                    self._make_request(author_commits_query),
+                )
+                self.logger.info(
+                    f"Пакет из {len(batch_repositories_data)} репозиториев успешно сохранён",
+                )
+            except Exception as e:
+                self.logger.error(f"Ошибка при сохранении пакета репозиториев: {e}")
+                raise InfrastructureException()
+
+            batch_repositories_data.clear()
+            batch_positions_data.clear()
+            batch_authors_commits_data.clear()
 
         self.logger.info("Завершено сохранение репозиториев")

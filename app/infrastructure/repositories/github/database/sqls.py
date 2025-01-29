@@ -1,6 +1,10 @@
 from typing import Final
 
 
+CREATE_REPOSITORIES_TABLES: Final[str] = "CREATE DATABASE IF NOT EXISTS {db_name}"
+
+# TODO: Добавить форматирование для базы данных
+
 CREATE_REPOSITORIES_TABLES_SQL_QUERIES: Final[list[str]] = [
     """
     CREATE TABLE IF NOT EXISTS test.repositories
