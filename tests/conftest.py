@@ -25,7 +25,7 @@ def faker() -> Faker:
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
-async def setup_before_all_tests(container: Container, faker: Faker) -> AsyncGenerator[Any, Any, Any]:
+async def setup_before_all_tests(container: Container, faker: Faker) -> AsyncGenerator[Any, Any]:
     random_seed: int = SystemRandom().randint(0, 9999)
     faker.seed_instance(random_seed)
 
