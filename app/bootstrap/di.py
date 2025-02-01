@@ -8,7 +8,7 @@ from punq import (
 from infrastructure.logger.base import ILogger
 from infrastructure.logger.factory import create_logger_dependency
 from infrastructure.repositories.github.api.scrapper import GithubRepositoryScrapper
-from infrastructure.repositories.github.database.base import BaseGitHubRepository
+from app.infrastructure.repositories.github.base import BaseGitHubRepository
 from infrastructure.repositories.github.database.clickhouse import GitHubClickHouseRepository
 from settings.config import (
     Settings,

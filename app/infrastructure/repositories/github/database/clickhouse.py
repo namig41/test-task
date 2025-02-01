@@ -18,7 +18,7 @@ from infrastructure.exceptions.repository import (
     RepositoryTimeOutException,
 )
 from infrastructure.logger.base import ILogger
-from infrastructure.repositories.github.database.base import BaseGitHubRepository
+from app.infrastructure.repositories.github.base import BaseGitHubRepository
 from infrastructure.repositories.github.database.converters import (
     convert_repository_data_to_author_stats_entity,
     convert_repository_data_to_entity,
@@ -86,39 +86,7 @@ class GitHubClickHouseRepository(BaseGitHubRepository):
             finally:
                 await client.close()
 
-    async def create_tables(self) -> None:
-        self.logger.info("Создание таблиц в базе данных ClickHouse")
-        for query in CREATE_REPOSITORIES_TABLES_SQL_QUERIES:
-            try:
-                await self._make_request(query)
-                self.logger.info(f"Таблица создана с запросом: {query}")
-            except Exception as e:
-                self.logger.error(
-                    f"Ошибка при создании таблицы с запросом: {query}, ошибка: {e}",
-                )
-                raise
 
-    async def drop_tables(self) -> None:
-        queries = [
-            "TRUNCATE TABLE test.repositories",
-            "TRUNCATE TABLE test.repositories_positions",
-            "TRUNCATE TABLE test.repositories_authors_commits",
-        ]
-
-        try:
-            await asyncio.gather(
-                *[self._make_request(query) for query in queries],
-            )
-            self.logger.info(f"Таблицы успешно очищены: {queries}")
-        except Exception as e:
-            self.logger.error(f"Ошибка при очистке таблицы: {e}")
-            raise
-
-    async def create_db(self, database_name: str) -> None:
-        try:
-            await self._make_request(CREATE_REPOSITORIES_DATABASE.format(db_name=database_name))
-        except InfrastructureException:
-            raise
 
     async def get_repository_by_name(self, name: str, owner: str) -> Repository:
         self.logger.info(f"Получение репозитория {name} от {owner}")

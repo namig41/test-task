@@ -1,14 +1,18 @@
 from dataclasses import dataclass
 
+from app.domain.entities.base import BaseEntity
+
 
 @dataclass
-class RepositoryAuthorCommitsNum:
+class RepositoryAuthorCommitsNum(BaseEntity):
     author: str
     commits_num: int
 
+    def validate(self) -> None: ...
+
 
 @dataclass
-class Repository:
+class Repository(BaseEntity):
     name: str
     owner: str
     position: int
@@ -17,3 +21,5 @@ class Repository:
     forks: int
     language: str
     authors_commits_num_today: list[RepositoryAuthorCommitsNum] | None = None
+
+    def validate(self) -> None: ...

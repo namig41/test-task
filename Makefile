@@ -4,14 +4,18 @@ EXEC = docker exec -it
 ENV = --env-file .env
 
 # === All Project ===
-.PHONY: all
+.PHONY: all stop clean
+
+
 all:
 	${DC} -f ${APP_FILE} ${ENV} up --build -d
 
-.PHONY: drop
-drop:
+stop:
 	${DC} -f ${APP_FILE} down
 
-.PHONY: clean
+tests:
+	uv run pytest
+
 clean:
 	${DC} -f ${APP_FILE} down --volumes --remove-orphans
+
