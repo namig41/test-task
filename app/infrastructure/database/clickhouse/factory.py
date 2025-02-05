@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 
-from aiochclient import ChClient
 import aiohttp
+from aiochclient import ChClient
 from app.infrastructure.database.config import DBConfig
+
 from infrastructure.database.factory import BaseConnectionFactory
+
 
 @dataclass
 class ConnectionFactory(BaseConnectionFactory):
@@ -18,5 +20,5 @@ class ConnectionFactory(BaseConnectionFactory):
                 password=self.config.DATABASE_PASSWORD,
                 compress_response=True,
             )
-            
+
             return client

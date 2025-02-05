@@ -6,6 +6,7 @@ from typing import (
 
 import aiohttp
 from aiochclient import ChClient
+from app.infrastructure.repositories.github.base import BaseGitHubRepository
 from tools import iterators
 
 from domain.entities.github import (
@@ -18,7 +19,6 @@ from infrastructure.exceptions.repository import (
     RepositoryTimeOutException,
 )
 from infrastructure.logger.base import ILogger
-from app.infrastructure.repositories.github.base import BaseGitHubRepository
 from infrastructure.repositories.github.database.converters import (
     convert_repository_data_to_author_stats_entity,
     convert_repository_data_to_entity,
@@ -27,8 +27,6 @@ from infrastructure.repositories.github.database.converters import (
     convert_repositoy_entity_to_position_data,
 )
 from infrastructure.repositories.github.database.sqls import (
-    CREATE_REPOSITORIES_DATABASE,
-    CREATE_REPOSITORIES_TABLES_SQL_QUERIES,
     GET_REPOSITORY_WITH_DETAILS,
     INSERT_AUTHORS_COMMITS,
     INSERT_POSITION,
@@ -86,8 +84,6 @@ class GitHubClickHouseRepository(BaseGitHubRepository):
             finally:
                 await client.close()
 
-
-
     async def get_repository_by_name(self, name: str, owner: str) -> Repository:
         self.logger.info(f"Получение репозитория {name} от {owner}")
         try:
@@ -139,7 +135,10 @@ class GitHubClickHouseRepository(BaseGitHubRepository):
             await asyncio.gather(
                 self._make_request(INSERT_REPOSITORY, repository_data),
                 self._make_request(INSERT_POSITION, postion_data),
-                *[self._make_request(INSERT_AUTHORS_COMMITS, author_stat) for author_stat in author_stats_data],
+                *[
+                    self._make_request(INSERT_AUTHORS_COMMITS, author_stat)
+                    for author_stat in author_stats_data
+                ],
             )
 
             self.logger.info(
@@ -157,18 +156,24 @@ class GitHubClickHouseRepository(BaseGitHubRepository):
             return
 
         # TODO: Вынести в константу
-        insert_repositories_query: Final[str] = """
+        insert_repositories_query: Final[
+            str
+        ] = """
             INSERT INTO test.repositories
             (name, owner, stars, watchers, forks, language, updated)
             VALUES
         """
 
-        insert_positions_query: Final[str] = """
+        insert_positions_query: Final[
+            str
+        ] = """
             INSERT INTO test.repositories_positions (date, repo, position)
             VALUES
         """
 
-        insert_authors_commits_query: Final[str] = """
+        insert_authors_commits_query: Final[
+            str
+        ] = """
             INSERT INTO test.repositories_authors_commits (date, repo, author, commits_num)
             VALUES
         """
@@ -179,7 +184,9 @@ class GitHubClickHouseRepository(BaseGitHubRepository):
 
         self.logger.info(f"Начинаем сохранение {len(repositories)} репозиториев")
 
-        for batch_repositories in iterators.batch_generator(repositories, self._batch_size):
+        for batch_repositories in iterators.batch_generator(
+            repositories, self._batch_size,
+        ):
             for repo in batch_repositories:
                 batch_repositories_data.append(
                     f"('{repo.name}', '{repo.owner}', {repo.stars}, "
@@ -202,7 +209,9 @@ class GitHubClickHouseRepository(BaseGitHubRepository):
                 position_query: str = f"{insert_positions_query} {values_clause}"
 
                 values_clause: str = ",".join(batch_authors_commits_data)
-                author_commits_query: str = f"{insert_authors_commits_query} {values_clause}"
+                author_commits_query: str = (
+                    f"{insert_authors_commits_query} {values_clause}"
+                )
 
             try:
                 await asyncio.gather(

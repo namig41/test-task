@@ -23,7 +23,11 @@ from infrastructure.repositories.github.api.converters import (
 
 class GithubRepositoryScrapper:
     def __init__(
-        self, access_token: str, logger: ILogger, mcr: int = 10, rps: float = .1,
+        self,
+        access_token: str,
+        logger: ILogger,
+        mcr: int = 10,
+        rps: float = 0.1,
     ):
         self._session = ClientSession(
             headers={
@@ -107,9 +111,9 @@ class GithubRepositoryScrapper:
             )
             raise InfrastructureException()
 
-    async def get_repositories(self) -> list[Repository]:
+    async def get_repositories(self, limit=10) -> list[Repository]:
         self.logger.info("Начинаем получать топовые репозитории")
-        top_repos: list[dict[str, Any]] = await self._get_top_repositories(limit=10)
+        top_repos: list[dict[str, Any]] = await self._get_top_repositories(limit=limit)
         repositories: list[Repository] = []
 
         for repo_data in top_repos:
